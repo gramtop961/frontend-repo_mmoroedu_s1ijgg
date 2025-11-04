@@ -1,110 +1,96 @@
-import { useMemo, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import Spline from '@splinetool/react-spline';
 
-export default function Hero({ onShopNow }) {
-  const [hover, setHover] = useState(false);
-  const title = 'Un sorso di benessere, ogni giorno.';
-  const letters = useMemo(() => title.split(''), [title]);
+export default function Hero({ onShop }) {
+  const containerRef = useRef(null);
+  const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start start', 'end start'] });
+
+  const titleY = useTransform(scrollYProgress, [0, 1], ['0%', '-20%']);
+  const titleOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
+  const vignetteOpacity = useTransform(scrollYProgress, [0, 1], [0.2, 0.6]);
+  const fogOpacity = useTransform(scrollYProgress, [0, 1], [0.15, 0.45]);
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-emerald-50">
-      {/* Soft overlays that don't block interaction with the 3D scene */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-emerald-200/30 via-transparent to-emerald-200/30" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(16,185,129,0.18),_transparent_60%)]" />
+    <section ref={containerRef} className="relative min-h-[120svh] w-full overflow-hidden bg-black">
+      <div className="absolute inset-0">
+        <Spline scene="https://prod.spline.design/6mI0F5J9a-hero-sample/scene.splinecode" style={{ width: '100%', height: '100%' }} />
+      </div>
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-        <div className="grid items-center gap-10 lg:grid-cols-2">
-          {/* Copy side */}
-          <div>
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: 'easeOut' }}
-              className="inline-flex items-center gap-2 rounded-full bg-emerald-600/10 px-3 py-1 text-xs text-emerald-800 ring-1 ring-emerald-200 backdrop-blur"
-            >
-              Benvenuto nel tuo rituale quotidiano
-            </motion.div>
+      {/* Soft gradient wash that doesn't block interactions */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/70 via-black/20 to-black/80" />
 
-            <h1 className="mt-4 text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900">
-              <span className="inline-block align-top">
-                {letters.map((ch, i) => (
-                  <motion.span
-                    key={i}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.03 * i, duration: 0.35, ease: 'easeOut' }}
-                  >
-                    {ch === ' ' ? '\u00A0' : ch}
-                  </motion.span>
-                ))}
+      {/* Cinematic Vignette */}
+      <motion.div
+        className="pointer-events-none absolute inset-0"
+        style={{ opacity: vignetteOpacity }}
+      >
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,black_95%)]" />
+      </motion.div>
+
+      {/* Volumetric fog layers */}
+      <motion.div
+        className="pointer-events-none absolute inset-0"
+        style={{ opacity: fogOpacity }}
+      >
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1695740633675-d060b607f5c4?ixid=M3w3OTkxMTl8MHwxfHNlYXJjaHwxfHxjZXJhbWljJTIwcG90dGVyeSUyMGhhbmRtYWRlfGVufDB8MHx8fDE3NjIxNzI2NDR8MA&ixlib=rb-4.1.0&w=1600&auto=format&fit=crop&q=80')] bg-cover mix-blend-screen opacity-30" />
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop')] bg-cover mix-blend-screen opacity-20" />
+      </motion.div>
+
+      {/* GTA6-style title block */}
+      <motion.div
+        className="relative z-10 mx-auto max-w-7xl px-6 pt-40 sm:pt-48 md:pt-56"
+        style={{ y: titleY, opacity: titleOpacity }}
+      >
+        <motion.h1
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+          className="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white"
+        >
+          Elevate your tea ritual
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.8, ease: 'easeOut' }}
+          className="mt-5 max-w-2xl text-lg sm:text-xl text-white/80"
+        >
+          Handpicked leaves. Cinematic flavor arcs. A world of aroma in every cup.
+        </motion.p>
+        <div className="mt-8 flex flex-col sm:flex-row gap-3">
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={onShop}
+            className="inline-flex items-center justify-center rounded-full bg-lime-400 text-black font-semibold px-6 py-3 shadow-[0_10px_30px_-10px_rgba(190,242,100,0.7)] hover:bg-lime-300 transition"
+          >
+            Shop the Collection
+          </motion.button>
+          <motion.a
+            whileHover={{ x: 4 }}
+            href="#story"
+            className="inline-flex items-center justify-center rounded-full px-6 py-3 ring-1 ring-white/20 text-white/90 hover:text-white hover:ring-white/40"
+          >
+            Discover the Story →
+          </motion.a>
+        </div>
+      </motion.div>
+
+      {/* Bottom marquee callout */}
+      <div className="pointer-events-none absolute bottom-0 inset-x-0 z-10">
+        <div className="relative h-20 overflow-hidden">
+          <motion.div
+            className="absolute whitespace-nowrap will-change-transform"
+            animate={{ x: ['0%', '-50%'] }}
+            transition={{ repeat: Infinity, duration: 30, ease: 'linear' }}
+          >
+            {Array.from({ length: 20 }).map((_, i) => (
+              <span key={i} className="mx-6 text-white/60 tracking-widest text-sm">
+                ORGANIC • SMALL BATCH • DIRECT TRADE • HANDCRAFTED • 
               </span>
-              <span className="ml-1 inline-block h-[1.1em] w-[2px] translate-y-[0.15em] bg-emerald-600/80 align-middle animate-pulse" aria-hidden />
-            </h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.6 }}
-              className="mt-4 max-w-xl text-slate-600"
-            >
-              Sorgenti sostenibili, miscele artigianali e aromi che portano calma. Scopri tè verdi, neri e infusi erbali selezionati con cura.
-            </motion.p>
-
-            <div className="relative mt-8">
-              <motion.button
-                onHoverStart={() => setHover(true)}
-                onHoverEnd={() => setHover(false)}
-                onClick={onShopNow}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.98 }}
-                className="relative inline-flex items-center justify-center gap-2 rounded-md bg-emerald-600 px-6 py-3 text-white shadow-lg shadow-emerald-900/10 ring-1 ring-emerald-500/10 transition-colors hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-              >
-                🛍️ Scopri le nostre miscele
-
-                {/* Steam puff microinteraction (behind the button) */}
-                <AnimatePresence>
-                  {hover && (
-                    <motion.span
-                      key="steam"
-                      initial={{ opacity: 0.0, y: 8, scale: 0.9, filter: 'blur(8px)' }}
-                      animate={{ opacity: 0.6, y: -22, scale: 1.15, filter: 'blur(2px)' }}
-                      exit={{ opacity: 0, y: -40, scale: 1.25, filter: 'blur(10px)' }}
-                      transition={{ duration: 0.9, ease: 'easeOut' }}
-                      className="pointer-events-none absolute -left-7 -top-5 inline-block h-10 w-10 rounded-full bg-white/70 mix-blend-screen"
-                      aria-hidden
-                    />
-                  )}
-                </AnimatePresence>
-              </motion.button>
-            </div>
-
-            <div className="mt-10 grid grid-cols-3 gap-6 text-center">
-              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}>
-                <div className="text-2xl font-bold text-slate-900">3000+</div>
-                <div className="text-xs text-slate-600">Clienti felici</div>
-              </motion.div>
-              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}>
-                <div className="text-2xl font-bold text-slate-900">50+</div>
-                <div className="text-xs text-slate-600">Origini singole</div>
-              </motion.div>
-              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}>
-                <div className="text-2xl font-bold text-slate-900">100%</div>
-                <div className="text-xs text-slate-600">Packaging plastic-free</div>
-              </motion.div>
-            </div>
-          </div>
-
-          {/* 3D Spline side */}
-          <div className="relative h-[380px] sm:h-[440px] md:h-[520px] lg:h-[560px]">
-            <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-emerald-100/60 to-emerald-200/40 blur-2xl" aria-hidden />
-            <div className="relative h-full w-full rounded-3xl border border-emerald-200/60 bg-white/40 backdrop-blur">
-              <Spline
-                scene="https://prod.spline.design/zBXGLjse1OwBSbps/scene.splinecode"
-                style={{ width: '100%', height: '100%' }}
-              />
-            </div>
-          </div>
+            ))}
+          </motion.div>
         </div>
       </div>
     </section>

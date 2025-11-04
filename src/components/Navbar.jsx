@@ -1,52 +1,31 @@
-import { ShoppingCart, Leaf, Menu } from 'lucide-react';
-import { useState } from 'react';
+import React from 'react';
+import { ShoppingCart, Leaf } from 'lucide-react';
 
-export default function Navbar({ cartCount = 0 }) {
-  const [open, setOpen] = useState(false);
-
+export default function Navbar({ cartCount = 0, onShop }) {
   return (
-    <header className="sticky top-0 z-40 w-full backdrop-blur supports-[backdrop-filter]:bg-white/70 bg-white/60 border-b border-emerald-100">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          <a href="#" className="flex items-center gap-2">
-            <div className="grid h-9 w-9 place-items-center rounded-full bg-emerald-100 text-emerald-700">
-              <Leaf size={18} />
-            </div>
-            <span className="font-semibold tracking-tight">Verdant Tea Co.</span>
-          </a>
-
-          <nav className="hidden md:flex items-center gap-8 text-sm text-slate-600">
-            <a href="#products" className="hover:text-emerald-700 transition-colors">Shop</a>
-            <a href="#about" className="hover:text-emerald-700 transition-colors">About</a>
-            <a href="#contact" className="hover:text-emerald-700 transition-colors">Contact</a>
-          </nav>
-
-          <div className="flex items-center gap-3">
-            <button className="relative rounded-full p-2 text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 transition-colors">
-              <ShoppingCart size={22} />
-              {cartCount > 0 && (
-                <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-emerald-600 px-1.5 text-xs font-medium text-white">
-                  {cartCount}
-                </span>
-              )}
-            </button>
-            <button
-              className="md:hidden inline-flex items-center justify-center rounded-md p-2 text-slate-600 hover:bg-emerald-50 hover:text-emerald-700"
-              onClick={() => setOpen((v) => !v)}
-              aria-label="Toggle menu"
-            >
-              <Menu size={22} />
-            </button>
+    <header className="fixed top-0 inset-x-0 z-50 bg-black/30 backdrop-blur supports-[backdrop-filter]:bg-black/20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div className="flex items-center gap-2 select-none">
+          <div className="h-9 w-9 rounded-full bg-lime-400/20 ring-1 ring-lime-300/40 flex items-center justify-center">
+            <Leaf className="h-5 w-5 text-lime-300" />
           </div>
+          <span className="text-white font-semibold tracking-wide">Verdant</span>
         </div>
-
-        {open && (
-          <div className="md:hidden pb-4 pt-2 space-y-2">
-            <a href="#products" className="block rounded-md px-3 py-2 text-slate-700 hover:bg-emerald-50">Shop</a>
-            <a href="#about" className="block rounded-md px-3 py-2 text-slate-700 hover:bg-emerald-50">About</a>
-            <a href="#contact" className="block rounded-md px-3 py-2 text-slate-700 hover:bg-emerald-50">Contact</a>
-          </div>
-        )}
+        <nav className="hidden md:flex items-center gap-8 text-sm">
+          <button onClick={onShop} className="text-white/80 hover:text-white transition">Shop</button>
+          <a href="#story" className="text-white/80 hover:text-white transition">Story</a>
+          <a href="#about" className="text-white/80 hover:text-white transition">About</a>
+        </nav>
+        <button
+          className="relative inline-flex items-center gap-2 rounded-full bg-white/10 text-white px-4 py-2 ring-1 ring-white/20 hover:bg-white/15 transition"
+          onClick={onShop}
+        >
+          <ShoppingCart className="h-4 w-4" />
+          <span className="hidden sm:inline">Cart</span>
+          {cartCount > 0 && (
+            <span className="absolute -top-2 -right-2 h-5 min-w-[1.25rem] px-1 flex items-center justify-center rounded-full bg-lime-400 text-black text-xs font-semibold">{cartCount}</span>
+          )}
+        </button>
       </div>
     </header>
   );
