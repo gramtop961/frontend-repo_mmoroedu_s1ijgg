@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import Navbar from './components/Navbar.jsx';
 import Hero from './components/Hero.jsx';
+import Story from './components/Story.jsx';
 import Products from './components/Products.jsx';
 import Footer from './components/Footer.jsx';
 
@@ -95,13 +96,16 @@ function App() {
   const updateQuery = (value) => setQuery(value);
   const updateCategory = (value) => setCategory(value);
 
+  const scrollToProducts = () => {
+    const el = document.getElementById('products');
+    el?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 via-white to-white text-slate-800">
       <Navbar cartCount={cartCount} />
-      <Hero onShopNow={() => {
-        const el = document.getElementById('products');
-        el?.scrollIntoView({ behavior: 'smooth' });
-      }} />
+      <Hero onShopNow={scrollToProducts} />
+      <Story onShop={scrollToProducts} />
 
       <main id="products" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
         <Products
